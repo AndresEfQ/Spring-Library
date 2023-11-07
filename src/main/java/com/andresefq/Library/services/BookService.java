@@ -3,6 +3,7 @@ package com.andresefq.Library.services;
 import com.andresefq.Library.entities.Book;
 import com.andresefq.Library.entities.Author;
 import com.andresefq.Library.entities.Publisher;
+import com.andresefq.Library.exceptions.MyException;
 import com.andresefq.Library.repository.AuthorRepository;
 import com.andresefq.Library.repository.BookRepository;
 import com.andresefq.Library.repository.PublisherRepository;
@@ -26,7 +27,9 @@ public class BookService {
     private PublisherRepository publisherRepository;
 
     @Transactional
-    public void createBook(Long isbn, String title, Integer instances, String authorId, String publisherId) {
+    public void createBook(Long isbn, String title, Integer instances, String authorId, String publisherId) throws MyException {
+
+        validate(isbn, title, instances, authorId, publisherId);
         Book book = new Book();
         Author author = authorRepository.findById(authorId).get();
         Publisher publisher = publisherRepository.findById(publisherId).get();
@@ -46,8 +49,9 @@ public class BookService {
     }
 
     @Transactional
-    public void modifyBook(Long isbn, String title, String authorId, String publisherId, Integer instances) {
+    public void modifyBook(Long isbn, String title, String authorId, String publisherId, Integer instances) throws MyException {
 
+        validate(isbn, title, instances, authorId, publisherId);
         Optional<Book> bookResponse = bookRepository.findById(isbn);
         Optional<Author> authorResponse = authorRepository.findById(authorId);
         Optional<Publisher> publisherResponse = publisherRepository.findById(publisherId);
@@ -71,6 +75,24 @@ public class BookService {
             book.setInstances(instances);
 
             bookRepository.save(book);
+        }
+    }
+
+    private void validate (Long isbn, String title, Integer instances, String authorId, String publisherId) throws MyException {
+        if (isbn == null) {
+            throw new MyException("Isbn can't be null");
+        }
+        if (title == null || title.isEmpty()) {
+            throw new MyException("Title can't be null or empty");
+        }
+        if (instances == null) {
+            throw new MyException("Instances can't be null");
+        }
+        if (authorId == null || authorId.isEmpty()) {
+            throw new MyException("Author ID can't be null or empty");
+        }
+        if (publisherId == null || publisherId.isEmpty()) {
+            throw new MyException("Publisher ID can't be null or empty");
         }
     }
 }
