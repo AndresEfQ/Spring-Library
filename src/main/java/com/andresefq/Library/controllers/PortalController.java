@@ -12,4 +12,9 @@ public class PortalController {
     public String index() {
         return "index.html";
     }
+
+    @GetMapping("/author")
+    public String author() {
+        return "author_index.html";
+    }
 }
